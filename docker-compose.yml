@@ -13,7 +13,7 @@ services:
       - SPRING_PROFILES_ACTIVE=mysql
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/petclinic
       - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=petclinic
+      - SPRING_DATASOURCE_PASSWORD=123456
     restart: on-failure
     develop:
       watch:
@@ -28,21 +28,23 @@ services:
         - action: sync
           path: src/main/resources/static
           target: /build/target/extracted/application/static
+
   mysql:
-    image: mysql:9.6
+    image: mysql:8.0
+    # platform: linux/x86_64
     ports:
-      - "3306:3306"
+      - "3307:3306"
     environment:
-      - MYSQL_ROOT_PASSWORD=petclinic
+      - MYSQL_ROOT_PASSWORD=123456
       - MYSQL_DATABASE=petclinic
     volumes:
       - mysql-data:/var/lib/mysql
     healthcheck:
-      # Lệnh kiểm tra MySQL đã sẵn sàng thực sự chưa
-      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost", "-u", "root", "-ppetclinic"]
-      interval: 10s
+      # Lệnh kiểm tra MySQL: dùng mật khẩu 123456 dính liền sau -p
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost", "-u", "root", "-p123456"]
+      interval: 5s
       timeout: 5s
-      retries: 5
+      retries: 10
 
 volumes:
   mysql-data:
