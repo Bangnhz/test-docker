@@ -39,3 +39,6 @@ jobs:
           push: true
           target: final
           tags: ${{ vars.DOCKER_USERNAME }}/${{ github.event.repository.name }}:latest
+      - name: Trigger Render Deployment
+        run: |
+          curl -f "https://api.render.com/deploy/srv-d85k160js32c73ali9u0?key=PPGAcuAYaw0"
