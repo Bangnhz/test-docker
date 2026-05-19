@@ -11,29 +11,35 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
     strategy:
       matrix:
         java: [ '17' ]
 
     steps:
-      - name: Build and test
+      # BƯỚC 1: Bắt buộc phải kéo code về máy ảo đầu tiên
+      - uses: actions/checkout@v4
+
+      # BƯỚC 2: Nhét lệnh sửa quyền chạy file mvnw vào ngay tại đây
+      - name: Grant execute permission for mvnw
+        run: chmod +x mvnw
+
+      # BƯỚC 3: Cài đặt môi trường Java JDK
+      - name: Set up JDK ${{ matrix.java }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ matrix.java }}
+          distribution: 'adopt'
+          cache: maven
+
+      # BƯỚC 4: Chạy lệnh kiểm thử và đóng gói Maven của bạn
+      - name: Build with Maven Wrapper
+        run: ./mvnw -B verify
+
+      # BƯỚC 5: Nếu bạn muốn chạy cả Docker Build test (Có thể giữ hoặc xóa tùy bạn)
+      - name: Build and test with Docker
         uses: docker/build-push-action@v7
         with:
           context: .
           target: test
           load: true
-          run: |
-            chmod +x mvnw
-            ./mvnw test
-        
-      - uses: actions/checkout@v4
-      - name: Set up JDK ${{matrix.java}}
-        uses: actions/setup-java@v4
-        with:
-          java-version: ${{matrix.java}}
-          distribution: 'adopt'
-          cache: maven
-      - name: Build with Maven Wrapper
-        run: ./mvnw -B verify
